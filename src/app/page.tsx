@@ -130,8 +130,8 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Sidebar: fixed narrow width */}
-          <div style={{ flex: "0 0 200px", width: 200, display: "flex", flexDirection: "column", gap: 10 }}>
+          {/* Sidebar: fixed narrow width, clipped */}
+          <div style={{ flex: "0 0 200px", width: 200, minWidth: 0, maxWidth: 200, boxSizing: "border-box", overflow: "hidden", display: "flex", flexDirection: "column", gap: 10 }}>
             <SchoolSelect schools={schoolNames} value={selectedSchool} onChange={setSelectedSchool} />
             <DateInputPanel selectedSchool={selectedSchool} onDatesSaved={onDatesSaved} />
           </div>
