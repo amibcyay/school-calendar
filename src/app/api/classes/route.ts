@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { appendClassesRows } from "@/lib/googleSheets";
+import { appendClassesRows, getClassesEntries } from "@/lib/googleSheets";
 import { normalizeDdMm } from "@/lib/dateNormalization";
 
 export const runtime = "nodejs";
@@ -12,6 +12,16 @@ type Payload = {
 function normalizeIncomingDate(value: string): string | null {
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
   return normalizeDdMm(value);
+}
+
+export async function GET() {
+  try {
+    const entries = await getClassesEntries();
+    return NextResponse.json({ entries });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to load classes";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
