@@ -43,10 +43,16 @@ export function MonthCalendar({
   const markedSet = new Set(markedDates);
   const title = monthDate.toLocaleDateString(undefined, { year: "numeric", month: "long" });
 
+  const gridCols = "repeat(7, minmax(0, 1fr))";
+
   return (
     <section
       style={{
         width: "100%",
+        maxWidth: "100%",
+        minWidth: 0,
+        boxSizing: "border-box",
+        overflow: "hidden",
         border: "1px solid #cbd5e1",
         borderRadius: 14,
         background: "#ffffff",
@@ -59,31 +65,35 @@ export function MonthCalendar({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "14px 16px",
+          gap: 8,
+          padding: "10px 12px",
           borderBottom: "1px solid #e2e8f0",
+          minWidth: 0,
         }}
       >
         <button onClick={onPreviousMonth} style={navBtnStyle} aria-label="上個月">
           ‹ 上個月
         </button>
-        <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{title}</h2>
+        <h2 style={{ margin: 0, fontSize: "clamp(14px, 4vw, 22px)", fontWeight: 700, minWidth: 0, textAlign: "center", flex: "1 1 auto" }}>{title}</h2>
         <button onClick={onNextMonth} style={navBtnStyle} aria-label="下個月">
           下個月 ›
         </button>
       </div>
 
-      {/* Day-of-week labels */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)" }}>
+      {/* Day-of-week labels — minmax(0,1fr) keeps all 7 columns inside the card on narrow screens */}
+      <div style={{ display: "grid", gridTemplateColumns: gridCols, width: "100%", minWidth: 0 }}>
         {["日", "一", "二", "三", "四", "五", "六"].map((d) => (
           <div
             key={d}
             style={{
               textAlign: "center",
-              padding: "8px 0",
+              padding: "6px 2px",
               color: "#475569",
               fontWeight: 600,
-              fontSize: 13,
+              fontSize: "clamp(10px, 2.8vw, 13px)",
               borderBottom: "1px solid #e2e8f0",
+              minWidth: 0,
+              overflow: "hidden",
             }}
           >
             {d}
@@ -98,6 +108,7 @@ export function MonthCalendar({
                 key={`empty-${idx}`}
                 style={{
                   minHeight: 110,
+                  minWidth: 0,
                   borderTop: "1px solid #f1f5f9",
                   background: "#fafafa",
                 }}
@@ -112,39 +123,53 @@ export function MonthCalendar({
               key={key}
               style={{
                 minHeight: 110,
-                padding: "6px 7px",
+                minWidth: 0,
+                padding: "4px 3px",
                 borderTop: "1px solid #f1f5f9",
                 borderLeft: idx % 7 === 0 ? "none" : "1px solid #f1f5f9",
                 background: marked ? "#eff6ff" : "#ffffff",
                 verticalAlign: "top",
+                overflow: "hidden",
               }}
             >
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{dt.getDate()}</div>
+              <div style={{ fontWeight: 700, fontSize: "clamp(11px, 3vw, 14px)", marginBottom: 2 }}>{dt.getDate()}</div>
               {events.map((ev, i) => (
                 <div
                   key={`${ev.schoolName}-${i}`}
                   style={{
-                    marginBottom: 4,
+                    marginBottom: 3,
                     background: "#dbeafe",
-                    borderRadius: 5,
-                    padding: "3px 5px",
-                    fontSize: 11,
-                    lineHeight: 1.4,
+                    borderRadius: 4,
+                    padding: "2px 3px",
+                    fontSize: "clamp(9px, 2.4vw, 11px)",
+                    lineHeight: 1.35,
                     color: "#1e3a8a",
                     overflow: "hidden",
+                    minWidth: 0,
+                    maxWidth: "100%",
                   }}
                 >
-                  <div style={{ fontWeight: 700, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }} title={ev.schoolName}>
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      overflow: "hidden",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      wordBreak: "break-word",
+                    }}
+                    title={ev.schoolName}
+                  >
                     {ev.schoolName}
                   </div>
                   {ev.location && (
-                    <div style={{ color: "#1d4ed8" }}>📍 {ev.location}</div>
+                    <div style={{ color: "#1d4ed8", wordBreak: "break-word", overflow: "hidden" }}>📍 {ev.location}</div>
                   )}
                   {ev.time && (
-                    <div style={{ color: "#1d4ed8" }}>🕐 {ev.time}</div>
+                    <div style={{ color: "#1d4ed8", wordBreak: "break-word", overflow: "hidden" }}>🕐 {ev.time}</div>
                   )}
                   {ev.instructor && (
-                    <div style={{ color: "#1d4ed8" }}>👤 {ev.instructor}</div>
+                    <div style={{ color: "#1d4ed8", wordBreak: "break-word", overflow: "hidden" }}>👤 {ev.instructor}</div>
                   )}
                 </div>
               ))}
