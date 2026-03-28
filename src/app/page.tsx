@@ -114,7 +114,7 @@ export default function HomePage() {
           {/* Calendar: fills remaining space */}
           <div style={{ flex: "1 1 0", minWidth: 0 }}>
             {loadingClasses ? (
-              <p style={{ color: "#64748b", marginTop: 40 }}>Loading calendar…</p>
+              <p style={{ color: "#64748b", marginTop: 40 }}>載入日曆中…</p>
             ) : (
               <MonthCalendar
                 monthDate={currentMonth}
