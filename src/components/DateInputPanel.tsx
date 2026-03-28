@@ -91,7 +91,7 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
   const allPreview = [...new Set([...parsedDates, ...pickedDates])].sort();
 
   return (
-    <section style={{ width: "100%", maxWidth: 420, background: "#fff", border: "1px solid #cbd5e1", borderRadius: 12, padding: 14 }}>
+    <section style={{ width: "100%", background: "#fff", border: "1px solid #cbd5e1", borderRadius: 12, padding: 14 }}>
       <h3 style={{ marginTop: 0 }}>Add Dates</h3>
       <div style={{ display: "grid", gap: 10 }}>
         <label style={{ display: "grid", gap: 6 }}>
