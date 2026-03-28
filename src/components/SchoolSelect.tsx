@@ -8,12 +8,12 @@ type Props = {
 
 export function SchoolSelect({ schools, value, onChange }: Props) {
   return (
-    <label style={{ display: "grid", gap: 6, width: "100%" }}>
-      <span style={{ fontSize: 13, fontWeight: 600, color: "#334155" }}>School</span>
+    <label style={{ display: "grid", gap: 4, width: "100%" }}>
+      <span style={{ fontSize: 11, fontWeight: 600, color: "#334155" }}>School</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", border: "1px solid #cbd5e1", borderRadius: 8, padding: "8px 10px" }}
+        style={{ width: "100%", border: "1px solid #cbd5e1", borderRadius: 6, padding: "5px 8px", fontSize: 12 }}
       >
         <option value="">Select a school</option>
         {schools.map((school) => (

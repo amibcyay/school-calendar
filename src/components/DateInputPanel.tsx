@@ -91,14 +91,15 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
   const allPreview = [...new Set([...parsedDates, ...pickedDates])].sort();
 
   return (
-    <section style={{ width: "100%", background: "#fff", border: "1px solid #cbd5e1", borderRadius: 12, padding: 14 }}>
-      <h3 style={{ marginTop: 0 }}>Add Dates</h3>
-      <div style={{ display: "grid", gap: 10 }}>
-        <label style={{ display: "grid", gap: 6 }}>
-          <span style={{ fontSize: 13, color: "#334155" }}>Upload image (Gemini AI text recognition)</span>
+    <section style={{ width: "100%", background: "#fff", border: "1px solid #cbd5e1", borderRadius: 10, padding: 10 }}>
+      <h3 style={{ marginTop: 0, marginBottom: 8, fontSize: 13, fontWeight: 700 }}>Add Dates</h3>
+      <div style={{ display: "grid", gap: 8 }}>
+        <label style={{ display: "grid", gap: 3 }}>
+          <span style={{ fontSize: 11, color: "#334155" }}>Upload image (AI recognition)</span>
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp,image/gif"
+            style={{ fontSize: 11 }}
             onChange={(e) => {
               const file = e.target.files?.[0] || null;
               e.currentTarget.value = "";
@@ -108,36 +109,36 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
           />
         </label>
 
-        <label style={{ display: "grid", gap: 6 }}>
-          <span style={{ fontSize: 13, color: "#334155" }}>Manual DD/MM input (one per line)</span>
+        <label style={{ display: "grid", gap: 3 }}>
+          <span style={{ fontSize: 11, color: "#334155" }}>Manual DD/MM (one per line)</span>
           <textarea
-            rows={4}
-            placeholder={"15/03\n19/03\n03/04/2026"}
+            rows={3}
+            placeholder={"15/03\n19/03"}
             value={manualText}
             onChange={(e) => setManualText(e.target.value)}
-            style={{ border: "1px solid #cbd5e1", borderRadius: 8, padding: 8 }}
+            style={{ border: "1px solid #cbd5e1", borderRadius: 6, padding: 5, fontSize: 12, resize: "vertical" }}
           />
         </label>
         <button onClick={() => void parseManualText()} disabled={busy} style={btnStyle}>
-          Parse Manual Dates
+          Parse Dates
         </button>
 
-        <label style={{ display: "grid", gap: 6 }}>
-          <span style={{ fontSize: 13, color: "#334155" }}>Multi-date picker</span>
-          <input type="date" onChange={(e) => addPickedDate(e.target.value)} />
+        <label style={{ display: "grid", gap: 3 }}>
+          <span style={{ fontSize: 11, color: "#334155" }}>Date picker</span>
+          <input type="date" style={{ fontSize: 12 }} onChange={(e) => addPickedDate(e.target.value)} />
         </label>
 
         <div>
-          <div style={{ fontSize: 13, color: "#334155", marginBottom: 4 }}>Dates to save</div>
-          <div style={{ border: "1px solid #e2e8f0", borderRadius: 8, minHeight: 60, padding: 8, fontSize: 14 }}>
-            {allPreview.length === 0 ? "No dates yet" : allPreview.join(", ")}
+          <div style={{ fontSize: 11, color: "#334155", marginBottom: 3 }}>Dates to save</div>
+          <div style={{ border: "1px solid #e2e8f0", borderRadius: 6, minHeight: 36, padding: 5, fontSize: 11, color: "#334155" }}>
+            {allPreview.length === 0 ? "None yet" : allPreview.join(", ")}
           </div>
         </div>
 
         <button onClick={() => void saveAll()} disabled={busy} style={primaryBtnStyle}>
-          {busy ? "Saving..." : "Save to Classes Sheet"}
+          {busy ? "Saving…" : "Save to Sheet"}
         </button>
-        {error ? <div style={{ color: "#b91c1c", fontSize: 13 }}>{error}</div> : null}
+        {error ? <div style={{ color: "#b91c1c", fontSize: 11 }}>{error}</div> : null}
       </div>
     </section>
   );
@@ -146,9 +147,10 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
 const btnStyle = {
   border: "1px solid #cbd5e1",
   background: "#f8fafc",
-  borderRadius: 8,
-  padding: "8px 10px",
+  borderRadius: 6,
+  padding: "5px 8px",
   cursor: "pointer",
+  fontSize: 12,
 };
 
 const primaryBtnStyle = {
