@@ -29,6 +29,36 @@ export async function getSchoolNames(): Promise<string[]> {
   return [...new Set(names)];
 }
 
+export type ClassEntry = { schoolName: string; date: string };
+
+export async function getClassesEntries(): Promise<ClassEntry[]> {
+  const auth = createSheetsJwt();
+  const sheets = google.sheets({ version: "v4", auth });
+  const spreadsheetId = getSpreadsheetId();
+  const classesSheet = getClassesSheetName();
+
+  const resp = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${classesSheet}!A:B`,
+  });
+  const rows = resp.data.values || [];
+  if (rows.length === 0) return [];
+
+  const first = rows[0].map((v) => String(v).trim().toLowerCase());
+  const hasHeader = first.includes("schoolname") || first.includes("name") || first.includes("date");
+  const dataRows = hasHeader ? rows.slice(1) : rows;
+
+  const entries: ClassEntry[] = [];
+  for (const row of dataRows) {
+    const schoolName = String(row[0] || "").trim();
+    const date = String(row[1] || "").trim();
+    if (schoolName && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      entries.push({ schoolName, date });
+    }
+  }
+  return entries;
+}
+
 export async function appendClassesRows(schoolName: string, dates: string[]): Promise<number> {
   if (!schoolName.trim() || dates.length === 0) return 0;
 
