@@ -57,8 +57,6 @@ export default function HomePage() {
     };
   }, []);
 
-  const calendarDates = useMemo(() => classEntries.map((e) => e.date), [classEntries]);
-
   const monthEntries = useMemo(() => {
     const y = currentMonth.getFullYear();
     const m = currentMonth.getMonth();
@@ -97,37 +95,53 @@ export default function HomePage() {
 
   return (
     <main style={{ minHeight: "100vh", padding: "20px 16px 36px" }}>
-      <div style={{ margin: "0 auto", maxWidth: 1100 }}>
+      <div style={{ margin: "0 auto", maxWidth: 1400 }}>
+        {/* Main two-column layout: calendar on left, sidebar on right */}
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            gap: 20,
             alignItems: "flex-start",
-            gap: 12,
-            marginBottom: 16,
             flexWrap: "wrap",
           }}
         >
-          <SchoolSelect schools={schools} value={selectedSchool} onChange={setSelectedSchool} />
-          <DateInputPanel selectedSchool={selectedSchool} onDatesSaved={onDatesSaved} />
-        </div>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          {loadingClasses ? (
-            <p style={{ color: "#64748b", marginTop: 40 }}>Loading calendar…</p>
-          ) : (
-            <MonthCalendar
-              monthDate={currentMonth}
-              markedDates={monthDates}
-              dateLabels={dateLabels}
-              onPreviousMonth={() =>
-                setCurrentMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))
-              }
-              onNextMonth={() =>
-                setCurrentMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))
-              }
+          {/* Left: calendar fills remaining width */}
+          <div style={{ flex: "1 1 560px", minWidth: 0 }}>
+            {loadingClasses ? (
+              <p style={{ color: "#64748b", marginTop: 40 }}>Loading calendar…</p>
+            ) : (
+              <MonthCalendar
+                monthDate={currentMonth}
+                markedDates={monthDates}
+                dateLabels={dateLabels}
+                onPreviousMonth={() =>
+                  setCurrentMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))
+                }
+                onNextMonth={() =>
+                  setCurrentMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))
+                }
+              />
+            )}
+          </div>
+
+          {/* Right sidebar: school dropdown on top, date input below */}
+          <div
+            style={{
+              flex: "0 0 340px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 14,
+            }}
+          >
+            <SchoolSelect
+              schools={schools}
+              value={selectedSchool}
+              onChange={setSelectedSchool}
             />
-          )}
+            <DateInputPanel selectedSchool={selectedSchool} onDatesSaved={onDatesSaved} />
+          </div>
         </div>
+
         {error ? <p style={{ color: "#b91c1c", marginTop: 12 }}>{error}</p> : null}
       </div>
     </main>
