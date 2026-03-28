@@ -2,7 +2,14 @@ import { google } from "googleapis";
 import { createSheetsJwt } from "./googleAuth";
 import { getClassesSheetName, getSchoolsSheetName, getSpreadsheetId } from "./env";
 
-export async function getSchoolNames(): Promise<string[]> {
+export type SchoolEntry = {
+  name: string;
+  location: string;
+  time: string;
+  instructor: string;
+};
+
+export async function getSchools(): Promise<SchoolEntry[]> {
   const auth = createSheetsJwt();
   const sheets = google.sheets({ version: "v4", auth });
   const spreadsheetId = getSpreadsheetId();
@@ -16,20 +23,45 @@ export async function getSchoolNames(): Promise<string[]> {
   if (rows.length === 0) return [];
 
   const header = rows[0].map((v) => String(v).trim().toLowerCase());
-  const nameIndex = header.indexOf("name");
-  if (nameIndex < 0) {
+  const col = (key: string) => header.indexOf(key);
+  const nameIdx = col("name");
+  if (nameIdx < 0) {
     throw new Error(`Could not find "Name" column in ${sheetName}`);
   }
+  const locationIdx = col("location");
+  const timeIdx = col("time");
+  const instructorIdx = col("instructor");
 
-  const names = rows
-    .slice(1)
-    .map((row) => String(row[nameIndex] || "").trim())
-    .filter(Boolean);
+  const seen = new Set<string>();
+  const entries: SchoolEntry[] = [];
 
-  return [...new Set(names)];
+  for (const row of rows.slice(1)) {
+    const name = String(row[nameIdx] || "").trim();
+    if (!name || seen.has(name)) continue;
+    seen.add(name);
+    entries.push({
+      name,
+      location: locationIdx >= 0 ? String(row[locationIdx] || "").trim() : "",
+      time: timeIdx >= 0 ? String(row[timeIdx] || "").trim() : "",
+      instructor: instructorIdx >= 0 ? String(row[instructorIdx] || "").trim() : "",
+    });
+  }
+
+  return entries;
 }
 
-export type ClassEntry = { schoolName: string; date: string };
+export async function getSchoolNames(): Promise<string[]> {
+  const schools = await getSchools();
+  return schools.map((s) => s.name);
+}
+
+export type ClassEntry = {
+  schoolName: string;
+  date: string;
+  location: string;
+  time: string;
+  instructor: string;
+};
 
 export async function getClassesEntries(): Promise<ClassEntry[]> {
   const auth = createSheetsJwt();
@@ -37,24 +69,38 @@ export async function getClassesEntries(): Promise<ClassEntry[]> {
   const spreadsheetId = getSpreadsheetId();
   const classesSheet = getClassesSheetName();
 
-  const resp = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: `${classesSheet}!A:B`,
-  });
-  const rows = resp.data.values || [];
+  const [classResp, schoolList] = await Promise.all([
+    sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${classesSheet}!A:B`,
+    }),
+    getSchools(),
+  ]);
+
+  const schoolMap = new Map(schoolList.map((s) => [s.name.toLowerCase(), s]));
+
+  const rows = classResp.data.values || [];
   if (rows.length === 0) return [];
 
   const first = rows[0].map((v) => String(v).trim().toLowerCase());
-  const hasHeader = first.includes("schoolname") || first.includes("name") || first.includes("date");
+  const hasHeader =
+    first.includes("schoolname") || first.includes("name") || first.includes("date");
   const dataRows = hasHeader ? rows.slice(1) : rows;
 
   const entries: ClassEntry[] = [];
   for (const row of dataRows) {
     const schoolName = String(row[0] || "").trim();
     const date = String(row[1] || "").trim();
-    if (schoolName && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      entries.push({ schoolName, date });
-    }
+    if (!schoolName || !/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+
+    const school = schoolMap.get(schoolName.toLowerCase());
+    entries.push({
+      schoolName,
+      date,
+      location: school?.location ?? "",
+      time: school?.time ?? "",
+      instructor: school?.instructor ?? "",
+    });
   }
   return entries;
 }
