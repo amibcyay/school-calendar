@@ -9,6 +9,7 @@ type Props = {
 };
 
 export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
+  const schoolReady = Boolean(selectedSchool?.trim());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [manualText, setManualText] = useState("");
@@ -18,6 +19,10 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
 
   async function parseImage(file: File | null) {
     if (!file) return;
+    if (!schoolReady) {
+      setError("請先選擇學校，才能上傳圖片或儲存至試算表");
+      return;
+    }
     setError("");
     setBusy(true);
     try {
@@ -35,6 +40,10 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
   }
 
   function parseManualText() {
+    if (!schoolReady) {
+      setError("請先選擇學校");
+      return;
+    }
     setError("");
     const lines = manualText
       .split(/\r?\n/)
@@ -44,7 +53,7 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
       .map((l) => normalizeDdMm(l))
       .filter((d): d is string => Boolean(d));
     if (normalized.length === 0) {
-      setError("沒有找到有效日期，請使用 DD/MM 格式");
+      setError("沒有找到有效日期，請使用 DD/MM/YYYY 格式（亦可只輸入 DD/MM）");
       return;
     }
     mergeDates(normalized);
@@ -52,6 +61,10 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
   }
 
   function addPickedDate() {
+    if (!schoolReady) {
+      setError("請先選擇學校");
+      return;
+    }
     if (!pickedDate) return;
     mergeDates([pickedDate]);
     setPickedDate("");
@@ -116,7 +129,12 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
   return (
     <section style={{ width: "100%", boxSizing: "border-box", background: "#fff", border: "1px solid #cbd5e1", borderRadius: 10, padding: 10, overflow: "hidden" }}>
       <h3 style={{ marginTop: 0, marginBottom: 8, fontSize: 13, fontWeight: 700 }}>新增課堂日期</h3>
-      <div style={{ display: "grid", gap: 8 }}>
+      {!schoolReady ? (
+        <p style={{ margin: "0 0 8px", fontSize: 11, color: "#b45309", background: "#fffbeb", border: "1px solid #fcd34d", borderRadius: 6, padding: "8px 10px" }}>
+          請先從上方選擇學校，才能上傳／輸入日期並儲存至 Google 試算表。
+        </p>
+      ) : null}
+      <div style={{ display: "grid", gap: 8, opacity: schoolReady ? 1 : 0.55, pointerEvents: schoolReady ? "auto" : "none" }}>
 
         {/* Image upload */}
         <label style={{ display: "grid", gap: 3 }}>
@@ -130,22 +148,23 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
               e.currentTarget.value = "";
               void parseImage(file);
             }}
-            disabled={busy}
+            disabled={busy || !schoolReady}
           />
         </label>
 
         {/* Manual text input */}
         <label style={{ display: "grid", gap: 3 }}>
-          <span style={{ fontSize: 11, color: "#334155" }}>手動輸入 DD/MM（每行一個）</span>
+          <span style={{ fontSize: 11, color: "#334155" }}>手動輸入 DD/MM/YYYY（每行一個）</span>
           <textarea
             rows={3}
-            placeholder={"15/03\n19/03"}
+            placeholder={"15/03/2026\n19/03/2026"}
             value={manualText}
             onChange={(e) => setManualText(e.target.value)}
+            disabled={!schoolReady}
             style={{ width: "100%", boxSizing: "border-box", border: "1px solid #cbd5e1", borderRadius: 6, padding: 5, fontSize: 12, resize: "none" }}
           />
         </label>
-        <button onClick={parseManualText} disabled={busy} style={btnStyle}>
+        <button onClick={parseManualText} disabled={busy || !schoolReady} style={btnStyle}>
           解析日期
         </button>
 
@@ -157,9 +176,10 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
               type="date"
               value={pickedDate}
               onChange={(e) => setPickedDate(e.target.value)}
+              disabled={!schoolReady}
               style={{ flex: 1, fontSize: 12, width: "100%", boxSizing: "border-box" }}
             />
-            <button onClick={addPickedDate} disabled={!pickedDate || busy} style={{ ...btnStyle, whiteSpace: "nowrap" }}>
+            <button onClick={addPickedDate} disabled={!pickedDate || busy || !schoolReady} style={{ ...btnStyle, whiteSpace: "nowrap" }}>
               加入
             </button>
           </div>
@@ -181,6 +201,7 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
                     value={d}
                     onChange={(e) => updateDate(i, e.target.value)}
                     placeholder="YYYY-MM-DD"
+                    disabled={!schoolReady}
                     style={{
                       flex: 1,
                       fontSize: 11,
@@ -194,6 +215,7 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
                   />
                   <button
                     onClick={() => removeDate(i)}
+                    disabled={!schoolReady}
                     style={{ ...btnStyle, padding: "3px 6px", fontSize: 11, color: "#b91c1c", borderColor: "#fca5a5" }}
                     title="刪除"
                   >
@@ -205,7 +227,15 @@ export function DateInputPanel({ selectedSchool, onDatesSaved }: Props) {
           )}
         </div>
 
-        <button onClick={() => void saveAll()} disabled={busy || dates.length === 0} style={primaryBtnStyle}>
+        <button
+          onClick={() => void saveAll()}
+          disabled={busy || !schoolReady || dates.length === 0}
+          style={{
+            ...primaryBtnStyle,
+            opacity: busy || !schoolReady || dates.length === 0 ? 0.55 : 1,
+            cursor: busy || !schoolReady || dates.length === 0 ? "not-allowed" : "pointer",
+          }}
+        >
           {busy ? "儲存中…" : "儲存至試算表"}
         </button>
         {error ? <div style={{ color: "#b91c1c", fontSize: 11, wordBreak: "break-word" }}>{error}</div> : null}
