@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 type Props = {
   monthDate: Date;
   markedDates: string[];
+  dateLabels?: Record<string, string[]>;
   onPreviousMonth: () => void;
   onNextMonth: () => void;
 };
@@ -15,7 +16,13 @@ function ymd(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-export function MonthCalendar({ monthDate, markedDates, onPreviousMonth, onNextMonth }: Props) {
+export function MonthCalendar({
+  monthDate,
+  markedDates,
+  dateLabels = {},
+  onPreviousMonth,
+  onNextMonth,
+}: Props) {
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
   const firstDay = new Date(year, month, 1);
@@ -60,16 +67,25 @@ export function MonthCalendar({ monthDate, markedDates, onPreviousMonth, onNextM
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 0 }}>
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-          <div key={d} style={{ textAlign: "center", padding: "8px 0", color: "#475569", fontWeight: 600 }}>
+          <div
+            key={d}
+            style={{ textAlign: "center", padding: "8px 0", color: "#475569", fontWeight: 600 }}
+          >
             {d}
           </div>
         ))}
         {cells.map((dt, idx) => {
           if (!dt) {
-            return <div key={`empty-${idx}`} style={{ minHeight: 84, borderTop: "1px solid #f1f5f9" }} />;
+            return (
+              <div
+                key={`empty-${idx}`}
+                style={{ minHeight: 84, borderTop: "1px solid #f1f5f9" }}
+              />
+            );
           }
           const key = ymd(dt);
           const marked = markedSet.has(key);
+          const labels = dateLabels[key] || [];
           return (
             <div
               key={key}
@@ -82,7 +98,29 @@ export function MonthCalendar({ monthDate, markedDates, onPreviousMonth, onNextM
               }}
             >
               <div style={{ fontWeight: 700 }}>{dt.getDate()}</div>
-              {marked ? <div style={{ marginTop: 6, fontSize: 12, color: "#1d4ed8" }}>Class</div> : null}
+              {labels.length > 0
+                ? labels.map((label) => (
+                    <div
+                      key={label}
+                      style={{
+                        marginTop: 4,
+                        fontSize: 11,
+                        color: "#1d4ed8",
+                        background: "#eff6ff",
+                        borderRadius: 4,
+                        padding: "2px 4px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                      title={label}
+                    >
+                      {label}
+                    </div>
+                  ))
+                : marked
+                  ? <div style={{ marginTop: 6, fontSize: 12, color: "#1d4ed8" }}>Class</div>
+                  : null}
             </div>
           );
         })}
