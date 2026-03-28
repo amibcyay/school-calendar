@@ -63,18 +63,18 @@ export function MonthCalendar({
           borderBottom: "1px solid #e2e8f0",
         }}
       >
-        <button onClick={onPreviousMonth} style={navBtnStyle} aria-label="Show previous month">
-          ‹ Previous
+        <button onClick={onPreviousMonth} style={navBtnStyle} aria-label="上個月">
+          ‹ 上個月
         </button>
         <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{title}</h2>
-        <button onClick={onNextMonth} style={navBtnStyle} aria-label="Show next month">
-          Next ›
+        <button onClick={onNextMonth} style={navBtnStyle} aria-label="下個月">
+          下個月 ›
         </button>
       </div>
 
       {/* Day-of-week labels */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)" }}>
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+        {["日", "一", "二", "三", "四", "五", "六"].map((d) => (
           <div
             key={d}
             style={{
