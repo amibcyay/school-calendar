@@ -26,7 +26,7 @@ export async function extractDatesFromImageGemini(
   mimeType: string,
 ): Promise<{ rawText: string; dates: string[] }> {
   const genAI = new GoogleGenerativeAI(getApiKey());
-  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash-001";
+  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
   const model = genAI.getGenerativeModel({ model: modelName });
 
   const year = new Date().getFullYear();
