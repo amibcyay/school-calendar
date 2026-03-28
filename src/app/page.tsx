@@ -113,8 +113,15 @@ export default function HomePage() {
     <main style={{ minHeight: "100vh", padding: "12px 12px 24px" }}>
       <div style={{ margin: "0 auto", maxWidth: 1280 }}>
         <div style={{ display: "flex", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
-          {/* Calendar: fills remaining space */}
-          <div style={{ flex: rightPanelOpen ? "1 1 0" : "1 1 100%", minWidth: 0, width: rightPanelOpen ? undefined : "100%" }}>
+          {/* Calendar: fills remaining space; when panel collapsed, order 2 so it sits below the expand bar */}
+          <div
+            style={{
+              flex: rightPanelOpen ? "1 1 0" : "1 1 100%",
+              minWidth: 0,
+              width: rightPanelOpen ? undefined : "100%",
+              order: rightPanelOpen ? 1 : 2,
+            }}
+          >
             {loadingClasses ? (
               <p style={{ color: "#64748b", marginTop: 40 }}>載入日曆中…</p>
             ) : (
@@ -132,7 +139,7 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Sidebar: collapsible (useful on mobile / short landscape) */}
+          {/* Sidebar: collapsible; when collapsed, order 1 so expand bar is above the calendar */}
           <aside
             style={{
               flex: rightPanelOpen ? "0 0 200px" : "1 1 100%",
@@ -144,6 +151,7 @@ export default function HomePage() {
               display: "flex",
               flexDirection: "column",
               gap: 10,
+              order: rightPanelOpen ? 2 : 1,
             }}
           >
             <button
