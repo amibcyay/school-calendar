@@ -108,11 +108,11 @@ export default function HomePage() {
   const schoolNames = useMemo(() => schools.map((s) => s.name), [schools]);
 
   return (
-    <main style={{ minHeight: "100vh", padding: "20px 16px 36px" }}>
-      <div style={{ margin: "0 auto", maxWidth: 1600 }}>
-        <div style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
-          {/* Calendar: 4/5 of the width */}
-          <div style={{ flex: "4 1 0", minWidth: 0 }}>
+    <main style={{ minHeight: "100vh", padding: "12px 12px 24px" }}>
+      <div style={{ margin: "0 auto", maxWidth: 1280 }}>
+        <div style={{ display: "flex", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
+          {/* Calendar: fills remaining space */}
+          <div style={{ flex: "1 1 0", minWidth: 0 }}>
             {loadingClasses ? (
               <p style={{ color: "#64748b", marginTop: 40 }}>Loading calendar…</p>
             ) : (
@@ -130,8 +130,8 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Sidebar: 1/5 of the width */}
-          <div style={{ flex: "1 1 0", minWidth: 220, display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* Sidebar: fixed narrow width */}
+          <div style={{ flex: "0 0 200px", width: 200, display: "flex", flexDirection: "column", gap: 10 }}>
             <SchoolSelect schools={schoolNames} value={selectedSchool} onChange={setSelectedSchool} />
             <DateInputPanel selectedSchool={selectedSchool} onDatesSaved={onDatesSaved} />
           </div>
